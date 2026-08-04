@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminDashboardController">
+
+    <top>
+        <VBox styleClass="header" alignment="CENTER">
+            <Label text="ADMIN DASHBOARD" styleClass="header-title">
+                <padding>
+                    <Insets bottom="10.0" top="20.0" />
+                </padding>
+            </Label>
+            <Label text="Welcome back, Administrator" styleClass="header-subtitle">
+                <padding>
+                    <Insets bottom="20.0" />
+                </padding>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="40.0" style="-fx-padding: 30;">
+
+            <!-- Statistics Cards -->
+            <HBox alignment="CENTER" spacing="20.0">
+                <VBox alignment="CENTER" prefHeight="180.0" prefWidth="200.0" spacing="15.0" styleClass="stat-card">
+                    <Label text="👥 Total Users" styleClass="stat-label" />
+                    <Label fx:id="totalUsersLabel" text="13" styleClass="stat-value" />
+                    <Label text="Registered customers" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+
+                <VBox alignment="CENTER" prefHeight="180.0" prefWidth="200.0" spacing="15.0" styleClass="stat-card">
+                    <Label text="⏳ Pending Requests" styleClass="stat-label" />
+                    <Label fx:id="pendingRequestsLabel" text="0" styleClass="stat-value" />
+                    <Label text="Awaiting approval" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+
+                <VBox alignment="CENTER" prefHeight="180.0" prefWidth="200.0" spacing="15.0" styleClass="stat-card">
+                    <Label text="💰 Total Purchases" styleClass="stat-label" />
+                    <Label fx:id="totalPurchasesLabel" text="R0.00" styleClass="stat-value" />
+                    <Label text="Completed transactions" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+
+                <VBox alignment="CENTER" prefHeight="180.0" prefWidth="200.0" spacing="15.0" styleClass="stat-card">
+                    <Label text="📈 Total Profit" styleClass="stat-label" />
+                    <Label fx:id="profitLabel" text="R0.00" styleClass="stat-value" />
+                    <Label text="Net profit" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+            </HBox>
+
+            <!-- Navigation Buttons -->
+            <VBox alignment="CENTER" spacing="20.0" styleClass="card" style="-fx-padding: 30; -fx-pref-width: 600;">
+                <Label text="Quick Actions" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #1e40af;" />
+
+                <HBox alignment="CENTER" spacing="15.0">
+                    <Button onAction="#handlePendingRequests" prefHeight="50.0" prefWidth="200.0" text="📋 Pending Requests" styleClass="btn-primary" />
+                    <Button onAction="#handleRequestHistory" prefHeight="50.0" prefWidth="200.0" text="📊 All History" styleClass="btn-primary" />
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="15.0">
+                    <Button onAction="#handleAnalytics" prefHeight="50.0" prefWidth="200.0" text="📈 Analytics" styleClass="btn-primary" />
+                    <Button onAction="#handleLogout" prefHeight="50.0" prefWidth="200.0" text="🚪 Logout" styleClass="btn-secondary" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="1000.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminRequestHistoryController">
+
+    <top>
+        <VBox styleClass="header" alignment="CENTER">
+            <Label text="📊 ALL FUEL REQUESTS HISTORY" styleClass="header-title">
+                <padding>
+                    <Insets bottom="10.0" top="20.0" />
+                </padding>
+            </Label>
+            <Label text="Complete transaction history and request tracking" styleClass="header-subtitle">
+                <padding>
+                    <Insets bottom="20.0" />
+                </padding>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20.0" style="-fx-padding: 20;">
+
+            <!-- Search and Controls -->
+            <HBox spacing="15.0" alignment="CENTER_LEFT" styleClass="card" style="-fx-padding: 20;">
+                <VBox spacing="8" style="-fx-pref-width: 400;">
+                    <Label text="🔍 Search Requests" styleClass="form-label" />
+                    <TextField fx:id="searchField" promptText="Search by customer, vehicle, or status..." styleClass="text-field" />
+                </VBox>
+
+                <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 25 0 0 0;">
+                    <Button onAction="#handleRefresh" text="🔄 Refresh" styleClass="btn-secondary" />
+                    <Button onAction="#handleBack" text="← Back to Dashboard" styleClass="btn-secondary" />
+                </HBox>
+            </HBox>
+
+            <!-- Requests Table -->
+            <VBox spacing="15.0" styleClass="card" style="-fx-padding: 20;">
+                <Label text="📈 All Fuel Requests" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e40af;" />
+
+                <TableView fx:id="requestsTable" prefHeight="450.0" prefWidth="960.0" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="idColumn" prefWidth="60.0" text="ID" />
+                        <TableColumn fx:id="customerColumn" prefWidth="140.0" text="Customer" />
+                        <TableColumn fx:id="phoneColumn" prefWidth="130.0" text="Phone" />
+                        <TableColumn fx:id="vehicleColumn" prefWidth="180.0" text="Vehicle" />
+                        <TableColumn fx:id="fuelColumn" prefWidth="100.0" text="Fuel Type" />
+                        <TableColumn fx:id="amountColumn" prefWidth="100.0" text="Amount (L)" />
+                        <TableColumn fx:id="totalColumn" prefWidth="120.0" text="Total Cost" />
+                        <TableColumn fx:id="statusColumn" prefWidth="110.0" text="Status" />
+                        <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Request Date" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

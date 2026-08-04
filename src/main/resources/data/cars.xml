@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cars>
+    <!-- Popular cars in South Africa -->
+    <make name="Toyota">
+        <model>Corolla Cross</model>
+        <model>Hilux</model>
+        <model>Fortuner</model>
+        <model>Quantum</model>
+        <model>Auris</model>
+        <model>RAV4</model>
+        <model>Yaris</model>
+        <model>Celica Sport Specialty II</model>
+        <model>MR2 GT</model>
+        <model>Sprinter Trueno GT Apex</model>
+        <model>Supra 2.0 GT</model>
+        <model>Supra RZ</model>
+        <model>Celica GT-Four ST205</model>
+        <model>86</model>
+        <model>GR Supra</model>
+        <model>86 TRD SE</model>
+    </make>
+
+    <make name="Volkswagen">
+        <model>Polo Vivo</model>
+        <model>Golf</model>
+        <model>Passat</model>
+        <model>Amarok</model>
+        <model>T-Cross</model>
+        <model>Touran</model>
+        <model>Corrado VR6</model>
+        <model>Golf Gti 16v Mk2</model>
+        <model>Golf R32</model>
+        <model>Beetle</model>
+        <model>Golf R</model>
+        <model>Scirocco R</model>
+        <model>#1107 Desert Dingo Racing Stock Bug</model>
+    </make>
+
+    <make name="Hyundai">
+        <model>Grand i10</model>
+        <model>Tucson</model>
+        <model>i20</model>
+        <model>Creta</model>
+        <model>Santa Fe</model>
+    </make>
+
+    <make name="Suzuki">
+        <model>Swift</model>
+        <model>Vitara</model>
+        <model>Baleno</model>
+        <model>Jimny</model>
+    </make>
+
+    <make name="Ford">
+        <model>Ranger</model>
+        <model>EcoSport</model>
+        <model>Focus</model>
+        <model>Kuga</model>
+        <model>Mustang</model>
+        <model>Ford GT</model>
+        <model>SVT Cobra R</model>
+        <model>Focus RS</model>
+        <model>Mustang GT Coupe</model>
+        <model>#2 GT40 MkII Le Mans</model>
+        <model>Mustang Shelby GT500</model>
+        <model>GT40 Mk I</model>
+    </make>
+
+    <make name="BMW">
+        <model>3 Series</model>
+        <model>5 Series</model>
+        <model>X1</model>
+        <model>X3</model>
+        <model>X5</model>
+        <model>M3</model>
+        <model>M3-GTR</model>
+        <model>M1</model>
+        <model>M635 CSi</model>
+        <model>2002 Turbo</model>
+        <model>M5</model>
+        <model>M6 Coupé '10</model>
+        <model>1 Series M Coupé</model>
+        <model>M4 Coupé</model>
+        <model>i8</model>
+    </make>
+
+    <make name="Mercedes-Benz">
+        <model>C-Class</model>
+        <model>E-Class</model>
+        <model>GLA</model>
+        <model>GLE</model>
+        <model>Sprinter</model>
+        <model>300 SL Coupé</model>
+        <model>C 32 AMG</model>
+        <model>CLK GTR</model>
+        <model>SL 65 AMG Black Series</model>
+        <model>300 SLR</model>
+        <model>#63 Sauber-Mercedes C 9</model>
+        <model>SLS AMG</model>
+    </make>
+
+    <make name="Nissan">
+        <model>Navara</model>
+        <model>NP200</model>
+        <model>Micra</model>
+        <model>Almera</model>
+        <model>Qashqai</model>
+        <model>Fairlady Z 432</model>
+        <model>Fairlady Z</model>
+        <model>Fairlady Z Version S Twin Turbo</model>
+        <model>Silvia CLUB K's</model>
+        <model>Silvia K's</model>
+        <model>Silvia Spec-R</model>
+        <model>Skyline GT-R V-Spec</model>
+        <model>Skyline GT-R V-Spec II</model>
+        <model>Skyline 2000GT-R</model>
+        <model>R390 (GT1)</model>
+        <model>GT-R (R35)</model>
+        <model>370Z Nismo</model>
+    </make>
+
+    <make name="Honda">
+        <model>Civic</model>
+        <model>CR-V</model>
+        <model>HR-V</model>
+        <model>Jazz</model>
+        <model>Civic Type R</model>
+        <model>CR-X SiR</model>
+        <model>NSX-R</model>
+        <model>S800</model>
+        <model>RA300</model>
+    </make>
+
+    <make name="Mazda">
+        <model>CX-5</model>
+        <model>2</model>
+        <model>3</model>
+        <model>BT-50</model>
+        <model>Savanna RX-7</model>
+        <model>RX-7</model>
+        <model>RX-7 Spirit R Type-A</model>
+        <model>MX-5 Miata</model>
+        <model>#55 Mazda 787B</model>
+        <model>RX-8 R3</model>
+        <model>MX-5</model>
+        <model>323 GT-R</model>
+    </make>
+
+    <make name="Isuzu">
+        <model>D-Max</model>
+    </make>
+
+    <make name="Chevrolet">
+        <model>Trailblazer</model>
+        <model>Captiva</model>
+        <model>Colorado</model>
+        <model>Camaro 35th Anniversary Super Sport</model>
+        <model>Camaro Super Sport Coupe</model>
+        <model>Chevelle Super Sport 454</model>
+        <model>Corvette Stingray 427</model>
+        <model>Corvette Z06</model>
+        <model>Corvette ZR-1</model>
+        <model>Camaro IROC-Z</model>
+        <model>El Camino Super Sport 454</model>
+        <model>Impala Super Sport 409</model>
+        <model>Corvette Stingray Coupe</model>
+    </make>
+
+    <!-- Exotic and sports cars (from original list) -->
+    <make name="Ferrari">
+        <model>250 GTO</model>
+        <model>F355 Berlinetta</model>
+        <model>512 TR</model>
+        <model>575M Maranello</model>
+        <model>Dino 246 GT</model>
+        <model>Enzo Ferrari</model>
+        <model>F40</model>
+        <model>F50</model>
+        <model>288 GTO</model>
+        <model>360 Challenge Stradale</model>
+        <model>F50 GT</model>
+        <model>430 Scuderia</model>
+        <model>F40 Competizione</model>
+        <model>250 Testa Rossa</model>
+        <model>599XX</model>
+        <model>458 Italia</model>
+        <model>LaFerrari</model>
+        <model>F12tdf</model>
+        <model>512 S</model>
+        <model>458 Speciale</model>
+        <model>500 Mondial</model>
+        <model>488 GTB</model>
+        <model>F8 Tributo</model>
+        <model>Monza SP2</model>
+    </make>
+
+    <!-- Continue exotic cars (Porsche, Lamborghini, Audi, etc.) as in your original file -->
+</cars>

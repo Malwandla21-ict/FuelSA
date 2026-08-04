@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminAnalyticsController">
+
+    <top>
+        <VBox styleClass="header" alignment="CENTER">
+            <Label text="ANALYTICS DASHBOARD" styleClass="header-title">
+                <padding>
+                    <Insets bottom="10.0" top="20.0" />
+                </padding>
+            </Label>
+            <Label text="Real-time fuel request statistics and financial analytics" styleClass="header-subtitle">
+                <padding>
+                    <Insets bottom="20.0" />
+                </padding>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="25.0" style="-fx-padding: 30;">
+
+            <!-- Assignment Requirements Section -->
+            <VBox spacing="20.0" styleClass="card">
+                <Label text="📊 Assignment Analytics Requirements" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #1e40af;" />
+
+                <HBox spacing="30.0" alignment="CENTER_LEFT">
+                    <VBox spacing="15.0" prefWidth="300">
+                        <Label text="1.5.3 - Total Money Paid for Fuel:" styleClass="form-label" />
+                        <Label text="1.5.4 - Customer Transaction Summary:" styleClass="form-label" />
+                        <Label text="1.5.5 - Total Profit Made:" styleClass="form-label" />
+                    </VBox>
+
+                    <VBox spacing="15.0">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label fx:id="totalMoneyLabel" text="R0.00" styleClass="stat-value" />
+                        </HBox>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <TextField fx:id="customerNameField" promptText="Enter customer name" prefWidth="200.0" styleClass="text-field" />
+                            <Button onAction="#handleCalculateCustomerTotal" text="Calculate" styleClass="btn-primary" />
+                            <Label fx:id="customerTotalLabel" text="R0.00" styleClass="stat-value" style="-fx-font-size: 16;" />
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label fx:id="profitLabel" text="R0.00" styleClass="stat-value" />
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Analytics Cards -->
+            <HBox spacing="20.0" alignment="CENTER">
+                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
+                    <Label text="📈 Total Requests" styleClass="stat-label" />
+                    <Label fx:id="totalRequestsLabel" text="0" styleClass="stat-value" />
+                    <Label text="All time requests" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+
+                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
+                    <Label text="✅ Approved" styleClass="stat-label" />
+                    <Label fx:id="approvedRequestsLabel" text="0" styleClass="stat-value" />
+                    <Label text="Completed requests" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+
+                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
+                    <Label text="⏳ Pending" styleClass="stat-label" />
+                    <Label fx:id="pendingRequestsLabel" text="0" styleClass="stat-value" />
+                    <Label text="Awaiting approval" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
+                </VBox>
+            </HBox>
+
+            <!-- Action Buttons -->
+            <HBox spacing="15.0" alignment="CENTER">
+                <Button onAction="#handleRefresh" text="🔄 Refresh Analytics" styleClass="btn-primary" />
+                <Button onAction="#handleBack" text="← Back to Dashboard" styleClass="btn-secondary" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

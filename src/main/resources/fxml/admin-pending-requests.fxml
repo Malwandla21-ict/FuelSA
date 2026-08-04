@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminPendingRequestsController">
+
+    <top>
+        <VBox styleClass="header" alignment="CENTER">
+            <Label text="⏳ PENDING FUEL REQUESTS" styleClass="header-title">
+                <padding>
+                    <Insets bottom="10.0" top="20.0" />
+                </padding>
+            </Label>
+            <Label text="Review and manage customer fuel requests awaiting approval" styleClass="header-subtitle">
+                <padding>
+                    <Insets bottom="20.0" />
+                </padding>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20.0" style="-fx-padding: 20;">
+
+            <!-- Requests Table -->
+            <VBox spacing="15.0" styleClass="card" style="-fx-padding: 20;">
+                <Label text="📋 Awaiting Approval" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e40af;" />
+
+                <TableView fx:id="requestsTable" prefHeight="400.0" prefWidth="860.0" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="idColumn" prefWidth="60.0" text="ID" />
+                        <TableColumn fx:id="customerColumn" prefWidth="150.0" text="Customer" />
+                        <TableColumn fx:id="vehicleColumn" prefWidth="200.0" text="Vehicle" />
+                        <TableColumn fx:id="fuelColumn" prefWidth="100.0" text="Fuel Type" />
+                        <TableColumn fx:id="amountColumn" prefWidth="100.0" text="Amount (L)" />
+                        <TableColumn fx:id="totalColumn" prefWidth="120.0" text="Total Cost" />
+                        <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Request Date" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Action Buttons -->
+            <HBox spacing="15.0" alignment="CENTER" styleClass="card" style="-fx-padding: 20;">
+                <Button onAction="#handleRefresh" text="🔄 Refresh" styleClass="btn-secondary" />
+                <Button onAction="#handleApprove" text="✅ Approve Selected" styleClass="btn-primary" />
+                <Button onAction="#handleReject" text="❌ Reject Selected" styleClass="btn-danger" />
+                <Button onAction="#handleBack" text="← Back to Dashboard" styleClass="btn-secondary" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

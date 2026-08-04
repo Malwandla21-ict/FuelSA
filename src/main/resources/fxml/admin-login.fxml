@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="500.0" prefWidth="600.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminLoginController">
+
+    <center>
+        <VBox alignment="CENTER" spacing="30.0" style="-fx-background-color: linear-gradient(to bottom right, #1e40af, #3b82f6); -fx-padding: 40;">
+
+            <VBox alignment="CENTER" spacing="25.0" styleClass="login-container">
+                <!-- Header -->
+                <VBox alignment="CENTER" spacing="10">
+                    <Label text="🔐 ADMIN LOGIN" style="-fx-font-weight: bold; -fx-font-size: 28; -fx-text-fill: #1e40af;" />
+                    <Label text="Administrator Access Only" style="-fx-text-fill: #6b7280; -fx-font-size: 14;" />
+                </VBox>
+
+                <!-- Login Form -->
+                <VBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-pref-width: 300;">
+                    <!-- Username Field -->
+                    <VBox spacing="8">
+                        <Label text="Username" styleClass="form-label" />
+                        <TextField fx:id="usernameField" promptText="Enter admin username" styleClass="text-field" />
+                    </VBox>
+
+                    <!-- Password Field -->
+                    <VBox spacing="8">
+                        <Label text="Password" styleClass="form-label" />
+                        <PasswordField fx:id="passwordField" promptText="Enter admin password" styleClass="password-field" />
+                    </VBox>
+
+                    <!-- Status Message -->
+                    <Label fx:id="statusLabel" style="-fx-text-fill: #dc2626; -fx-font-size: 13; -fx-wrap-text: true; -fx-pref-width: 300;" />
+
+                    <!-- Login Button -->
+                    <Button fx:id="loginButton" onAction="#handleLogin" text="🔑 LOGIN" styleClass="btn-primary"
+                            style="-fx-pref-width: 300; -fx-font-size: 16;" />
+
+                    <!-- Back Link -->
+                    <HBox alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                        <Hyperlink onAction="#handleBack" text="← Back to User Login"
+                                   style="-fx-text-fill: #2563eb; -fx-font-size: 13; -fx-border-color: transparent; -fx-underline: true;" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

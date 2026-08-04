@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cars>
+    <make name="Toyota">
+        <model>Hilux</model>
+        <model>Corolla Cross</model>
+        <model>Starlet</model>
+        <model>Fortuner</model>
+        <model>Urban Cruiser</model>
+        <model>Land Cruiser 79</model>
+        <model>Rumion</model>
+    </make>
+
+    <make name="Volkswagen">
+        <model>Polo Vivo</model>
+        <model>Polo</model>
+        <model>T-Cross</model>
+        <model>Golf GTI</model>
+        <model>Tiguan</model>
+    </make>
+
+    <make name="Ford">
+        <model>Ranger</model>
+        <model>Everest</model>
+        <model>Ecosport</model>
+    </make>
+
+    <make name="Isuzu">
+        <model>D-Max</model>
+        <model>MU-X</model>
+    </make>
+
+    <make name="Suzuki">
+        <model>Swift</model>
+        <model>Baleno</model>
+        <model>Fronx</model>
+        <model>Jimny</model>
+        <model>Vitara Brezza</model>
+    </make>
+
+    <make name="Hyundai">
+        <model>Grand i10</model>
+        <model>Tucson</model>
+        <model>Kona</model>
+        <model>Venue</model>
+    </make>
+
+    <make name="Kia">
+        <model>Picanto</model>
+        <model>Sportage</model>
+        <model>Seltos</model>
+    </make>
+
+    <make name="Nissan">
+        <model>Magnite</model>
+        <model>Navara</model>
+        <model>Qashqai</model>
+        <model>X-Trail</model>
+    </make>
+
+    <make name="Chery">
+        <model>Tiggo 4 Pro</model>
+        <model>Tiggo 7 Pro</model>
+        <model>Tiggo 8 Pro</model>
+    </make>
+
+    <make name="Mahindra">
+        <model>Scorpio-N</model>
+        <model>XUV700</model>
+        <model>Bolero</model>
+        <model>Pik Up</model>
+    </make>
+
+    <make name="Renault">
+        <model>Kwid</model>
+        <model>Clio</model>
+        <model>Triber</model>
+    </make>
+
+    <make name="Haval">
+        <model>Jolion</model>
+        <model>H6</model>
+    </make>
+</cars>
