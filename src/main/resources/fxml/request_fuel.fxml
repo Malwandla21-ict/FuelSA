@@ -1,103 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1"
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="app.controllers.RequestFuelController"
             stylesheets="@../css/styles.css">
 
+    <!-- Top bar -->
     <top>
-        <VBox styleClass="header" alignment="CENTER">
-            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 10 0 10 0;">
-                <Text text="⛽ Request Fuel" style="-fx-font-weight: bold; -fx-font-size: 28; -fx-fill: white;" />
-                <Button onAction="#onLogout" text="🚪 Logout" styleClass="btn-secondary"
-                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-border-color: rgba(255,255,255,0.3);" />
-            </HBox>
-            <Label text="Submit your fuel request and we'll notify you when approved" styleClass="header-subtitle">
-                <padding>
-                    <Insets bottom="15.0" />
-                </padding>
-            </Label>
-        </VBox>
+        <HBox styleClass="topbar">
+            <StackPane styleClass="logo-chip">
+                <FontIcon iconLiteral="mdi2g-gas-station" />
+            </StackPane>
+            <Label text="FuelSA" styleClass="app-name" />
+            <Region HBox.hgrow="ALWAYS" />
+            <StackPane styleClass="avatar">
+                <Label fx:id="lblInitials" text="?" />
+            </StackPane>
+            <Label fx:id="lblUserName" text="Guest" styleClass="user-name" />
+            <Button text="Sign out" onAction="#onLogout" styleClass="ghost">
+                <graphic><FontIcon iconLiteral="mdi2l-logout" /></graphic>
+            </Button>
+        </HBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-border-color: transparent;">
-            <VBox spacing="25" style="-fx-padding: 30;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox styleClass="page">
 
-                <!-- Main Request Card -->
-                <VBox spacing="20" styleClass="card" style="-fx-padding: 30;">
+                <VBox spacing="4">
+                    <Label text="Request fuel" styleClass="h1" />
+                    <Label fx:id="lblGreeting" text="Tell us about your car and how much fuel you need." styleClass="subtitle" />
+                </VBox>
 
-                    <!-- Vehicle Selection Section -->
-                    <VBox spacing="15">
-                        <Label text="🚗 Vehicle Information" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #1e40af;" />
+                <HBox spacing="22">
 
-                        <HBox spacing="20" alignment="TOP_LEFT">
-                            <!-- Dropdown Selection -->
-                            <VBox spacing="15" style="-fx-pref-width: 250;">
-                                <VBox spacing="8">
-                                    <Label text="Car Make" styleClass="form-label" />
-                                    <ComboBox fx:id="cbMake" styleClass="combo-box" />
+                    <!-- Left column: vehicle + fuel -->
+                    <VBox spacing="22" HBox.hgrow="ALWAYS">
+
+                        <VBox styleClass="card">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Your vehicle" styleClass="card-title">
+                                    <graphic><FontIcon iconLiteral="mdi2c-car-outline" /></graphic>
+                                </Label>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="lblRegistration" styleClass="badge, neutral" />
+                            </HBox>
+
+                            <GridPane hgap="14" vgap="12">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50" />
+                                    <ColumnConstraints percentWidth="50" />
+                                </columnConstraints>
+                                <VBox spacing="6" GridPane.columnIndex="0">
+                                    <Label text="Make" styleClass="field-label" />
+                                    <ComboBox fx:id="cbMake" promptText="Select make" maxWidth="Infinity" />
                                 </VBox>
-
-                                <VBox spacing="8">
-                                    <Label text="Car Model" styleClass="form-label" />
-                                    <ComboBox fx:id="cbModel" styleClass="combo-box" />
+                                <VBox spacing="6" GridPane.columnIndex="1">
+                                    <Label text="Model" styleClass="field-label" />
+                                    <ComboBox fx:id="cbModel" promptText="Select model" maxWidth="Infinity" />
                                 </VBox>
-                            </VBox>
+                            </GridPane>
 
-                            <!-- Custom Car Entry -->
-                            <VBox spacing="15" style="-fx-pref-width: 300;">
-                                <VBox spacing="8">
-                                    <Label text="🔧 Or Enter Custom Car" styleClass="form-label" />
-                                    <TextField fx:id="tfCarName" promptText="Enter your car model" styleClass="text-field" />
-                                </VBox>
-
-                                <HBox spacing="10">
-                                    <Button text="➕ Add Car" onAction="#onAddCar" styleClass="btn-secondary" />
-                                    <Button text="🗑️ Clear" onAction="#onClearCarInfo" styleClass="btn-secondary" />
+                            <VBox spacing="6">
+                                <Label text="Car not in the list?" styleClass="field-label" />
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <HBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                        <FontIcon iconLiteral="mdi2p-pencil-outline" />
+                                        <TextField fx:id="tfCarName" promptText="Type your car, e.g. Kia Picanto" HBox.hgrow="ALWAYS" />
+                                    </HBox>
+                                    <Button text="Add" onAction="#onAddCar" styleClass="secondary">
+                                        <graphic><FontIcon iconLiteral="mdi2p-plus" /></graphic>
+                                    </Button>
+                                    <Button text="Clear" onAction="#onClearCarInfo" styleClass="ghost">
+                                        <graphic><FontIcon iconLiteral="mdi2e-eraser" /></graphic>
+                                    </Button>
                                 </HBox>
                             </VBox>
-                        </HBox>
+                        </VBox>
+
+                        <VBox styleClass="card">
+                            <Label text="Fuel" styleClass="card-title">
+                                <graphic><FontIcon iconLiteral="mdi2f-fuel" /></graphic>
+                            </Label>
+                            <GridPane hgap="14" vgap="12">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50" />
+                                    <ColumnConstraints percentWidth="50" />
+                                </columnConstraints>
+                                <VBox spacing="6" GridPane.columnIndex="0">
+                                    <Label text="How many litres?" styleClass="field-label" />
+                                    <HBox styleClass="input-group">
+                                        <FontIcon iconLiteral="mdi2w-water-outline" />
+                                        <TextField fx:id="tfFuelCapacity" promptText="e.g. 40" HBox.hgrow="ALWAYS" />
+                                    </HBox>
+                                </VBox>
+                                <VBox spacing="6" GridPane.columnIndex="1">
+                                    <Label text="Fuel type" styleClass="field-label" />
+                                    <HBox styleClass="input-group">
+                                        <FontIcon iconLiteral="mdi2g-gas-station-outline" />
+                                        <Label text="Petrol 95" styleClass="input-static" minWidth="-Infinity" />
+                                    </HBox>
+                                </VBox>
+                            </GridPane>
+                        </VBox>
                     </VBox>
 
-                    <!-- Fuel Details Section -->
-                    <VBox spacing="15">
-                        <Label text="⛽ Fuel Details" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #1e40af;" />
+                    <!-- Right column: summary + history -->
+                    <VBox spacing="22" minWidth="340" prefWidth="360" maxWidth="380">
 
-                        <HBox spacing="30" alignment="CENTER_LEFT">
-                            <VBox spacing="8" style="-fx-pref-width: 250;">
-                                <Label text="Fuel Capacity (Liters)" styleClass="form-label" />
-                                <TextField fx:id="tfFuelCapacity" promptText="Enter fuel capacity" styleClass="text-field" />
+                        <VBox styleClass="card">
+                            <Label text="Summary" styleClass="card-title">
+                                <graphic><FontIcon iconLiteral="mdi2r-receipt" /></graphic>
+                            </Label>
+                            <HBox styleClass="summary-row">
+                                <Label text="Price per litre" styleClass="summary-key" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="lblPricePerLitre" text="R0.00" styleClass="summary-value" />
+                            </HBox>
+                            <HBox styleClass="summary-row">
+                                <Label text="Litres" styleClass="summary-key" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="lblLitres" text="—" styleClass="summary-value" />
+                            </HBox>
+                            <Separator />
+                            <VBox spacing="2">
+                                <Label text="Estimated total" styleClass="summary-key" />
+                                <Label fx:id="lblEstimate" text="R0.00" styleClass="total-value" />
                             </VBox>
 
-                            <VBox spacing="8" style="-fx-pref-width: 250;">
-                                <Label text="💰 Current Price" styleClass="form-label" />
-                                <Text fx:id="txtPriceInfo" style="-fx-font-size: 14; -fx-fill: #1e40af; -fx-font-weight: bold;" />
-                            </VBox>
-                        </HBox>
+                            <Label fx:id="lblFeedback" visible="false" managed="false" />
+
+                            <Button text="Submit request" onAction="#onRequestFuel" defaultButton="true" styleClass="primary, block" maxWidth="Infinity">
+                                <graphic><FontIcon iconLiteral="mdi2s-send-outline" /></graphic>
+                            </Button>
+                            <HBox alignment="CENTER">
+                                <Hyperlink fx:id="btnRefreshPrices" text="Refresh prices" styleClass="link">
+                                    <graphic><FontIcon iconLiteral="mdi2r-refresh" /></graphic>
+                                </Hyperlink>
+                            </HBox>
+                        </VBox>
+
+                        <VBox styleClass="card" spacing="4">
+                            <Label text="Your recent requests" styleClass="card-title">
+                                <graphic><FontIcon iconLiteral="mdi2h-history" /></graphic>
+                            </Label>
+                            <VBox fx:id="recentList" />
+                        </VBox>
                     </VBox>
-
-                    <!-- Action Buttons -->
-                    <VBox spacing="15" alignment="CENTER">
-                        <Button onAction="#onRequestFuel" text="📨 Submit Fuel Request" styleClass="btn-primary"
-                                style="-fx-pref-width: 300; -fx-font-size: 16;" />
-
-                        <HBox spacing="10" alignment="CENTER">
-                            <Button fx:id="btnRefreshPrices" text="🔄 Refresh Prices" styleClass="btn-secondary" />
-                        </HBox>
-                    </VBox>
-                </VBox>
-
-                <!-- Details & Status Section -->
-                <VBox spacing="15" styleClass="card" style="-fx-padding: 25;">
-                    <Label text="📋 Request Details and Status" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e40af;" />
-                    <TextArea fx:id="taDetails" prefRowCount="8" styleClass="text-area"
-                              promptText="Your request details and status will appear here..." />
-                </VBox>
+                </HBox>
             </VBox>
         </ScrollPane>
     </center>

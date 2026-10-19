@@ -5,7 +5,8 @@ import app.models.User;
 import app.database.UserDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
+import app.ui.Ui;
+import app.ui.Ui.MessageType;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.InputStream;
@@ -14,7 +15,7 @@ public class RegisterController {
     @FXML private TextField firstName, lastName, email, idNumber, username, carReg, phoneNumber;
     @FXML private PasswordField password, passwordConfirm;
     @FXML private ComboBox<String> cbCarMake, cbCarModel;
-    @FXML private Text txtMessage;
+    @FXML private Label lblMessage;
 
     private UserDAO userDAO = new UserDAO();
 
@@ -75,51 +76,51 @@ public class RegisterController {
     @FXML
     private void onSubmit() {
         // Reset message
-        txtMessage.setText("");
+        Ui.hideMessage(lblMessage);
 
         // Validate all fields
         if (firstName.getText().isEmpty() || lastName.getText().isEmpty() ||
                 email.getText().isEmpty() || idNumber.getText().isEmpty() ||
                 username.getText().trim().isEmpty() || password.getText().isEmpty() ||
                 phoneNumber.getText().isEmpty()) {
-            txtMessage.setText("Please fill in all required fields.");
+            Ui.showMessage(lblMessage, "Please fill in all required fields.", MessageType.ERROR);
             return;
         }
 
         if (!password.getText().equals(passwordConfirm.getText())) {
-            txtMessage.setText("Passwords do not match.");
+            Ui.showMessage(lblMessage, "Passwords do not match.", MessageType.ERROR);
             return;
         }
 
         // Validate password strength
         if (password.getText().length() < 6) {
-            txtMessage.setText("Password must be at least 6 characters long.");
+            Ui.showMessage(lblMessage, "Password must be at least 6 characters long.", MessageType.ERROR);
             return;
         }
 
         // Check if username already exists
         if (userDAO.userExists(username.getText().trim())) {
-            txtMessage.setText("Username already exists.");
+            Ui.showMessage(lblMessage, "Username already exists.", MessageType.ERROR);
             return;
         }
 
         // Validate phone number format and length
         String phone = phoneNumber.getText().replaceAll("[^0-9]", "");
         if (phone.length() != 10) {
-            txtMessage.setText("Please enter a valid 10-digit South African phone number (e.g., 0812345678).");
+            Ui.showMessage(lblMessage, "Please enter a valid 10-digit South African phone number (e.g., 0812345678).", MessageType.ERROR);
             return;
         }
 
         // Validate ID number (South African ID numbers are 13 digits)
         String idNum = idNumber.getText().replaceAll("[^0-9]", "");
         if (idNum.length() != 13) {
-            txtMessage.setText("Please enter a valid 13-digit South African ID number.");
+            Ui.showMessage(lblMessage, "Please enter a valid 13-digit South African ID number.", MessageType.ERROR);
             return;
         }
 
         // Validate email format
         if (!email.getText().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            txtMessage.setText("Please enter a valid email address.");
+            Ui.showMessage(lblMessage, "Please enter a valid email address.", MessageType.ERROR);
             return;
         }
 
@@ -138,7 +139,7 @@ public class RegisterController {
         // Save to database
         boolean saved = userDAO.createUser(u);
         if (saved) {
-            txtMessage.setText("Registered successfully! Logging you in...");
+            Ui.showMessage(lblMessage, "Account created! Signing you in...", MessageType.SUCCESS);
 
             // Auto-login after successful registration
             User newUser = userDAO.getUserByUsername(username.getText().trim());
@@ -146,11 +147,11 @@ public class RegisterController {
                 // Pass the new user to the request fuel controller
                 SceneController.show("request_fuel", newUser);
             } else {
-                txtMessage.setText("Registration successful but login failed. Please login manually.");
+                Ui.showMessage(lblMessage, "Registration successful but login failed. Please login manually.", MessageType.ERROR);
             }
 
         } else {
-            txtMessage.setText("Registration failed. Please try again.");
+            Ui.showMessage(lblMessage, "Registration failed. Please try again.", MessageType.ERROR);
         }
     }
 

@@ -9,6 +9,17 @@ How to run (Maven):
 3. From this project root run:
    mvn clean javafx:run
 
+Demo mode (sample data to click through):
+   mvn javafx:run -Pdemo
+- In IntelliJ: add `--demo` as the program argument of the run configuration for app.Main
+  (and reload the Maven project so the icon library is picked up).
+- Uses a separate `fuel_app_demo.db` filled with 6 made-up customers, an admin account and
+  28 fuel requests, so your real `fuel_app.db` is never touched. SMS is switched off.
+- Demo logins:
+    Customers: thandi, sipho, lerato, pieter, ayesha, kagiso - password: Demo@1234
+    Admin:     admin - password: FuelSA-demo-2026
+- Delete `fuel_app_demo.db` to start over with fresh demo data.
+
 First run:
 - The app creates `fuel_app.db` (SQLite) in the working directory.
 - There is no default admin. Open "Admin Login", type a username and click LOGIN to

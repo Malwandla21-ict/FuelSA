@@ -96,6 +96,40 @@ public class FuelRequestDAO {
         return requests;
     }
 
+    /** The newest requests made by one customer (same columns as getAllFuelRequests). */
+    public List<String[]> getRequestsForUser(int userId, int limit) {
+        List<String[]> requests = new ArrayList<>();
+        String sql = "SELECT * FROM fuel_requests WHERE user_id = ? ORDER BY request_date DESC LIMIT ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, limit);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                requests.add(new String[]{
+                        String.valueOf(rs.getInt("id")),
+                        rs.getString("customer_name"),
+                        rs.getString("customer_phone"),
+                        rs.getString("vehicle_model"),
+                        rs.getString("registration"),
+                        rs.getString("fuel_type"),
+                        String.valueOf(rs.getDouble("fuel_amount")),
+                        String.valueOf(rs.getDouble("total_amount")),
+                        rs.getString("status"),
+                        rs.getString("request_date")
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return requests;
+    }
+
     public boolean updateRequestStatus(int requestId, String status) {
         String sql = "UPDATE fuel_requests SET status = ? WHERE id = ?";
 

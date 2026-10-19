@@ -12,14 +12,26 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:sqlite:fuel_app.db";
+    public static final String DEFAULT_DB_FILE = "fuel_app.db";
 
-    static {
-        initializeDatabase();
+    private static String url = "jdbc:sqlite:" + DEFAULT_DB_FILE;
+    private static boolean initialized = false;
+
+    /** Points the app at a different database file. Must be called before init(). */
+    public static synchronized void useDatabase(String fileName) {
+        if (initialized) {
+            throw new IllegalStateException("Database already initialized");
+        }
+        url = "jdbc:sqlite:" + fileName;
     }
 
-    /** Forces the static initializer to run (call once at startup). */
-    public static void init() {}
+    /** Creates tables and upgrades old data. Safe to call more than once. */
+    public static synchronized void init() {
+        if (!initialized) {
+            initialized = true;
+            initializeDatabase();
+        }
+    }
 
     private static void initializeDatabase() {
         try (Connection conn = getConnection();
@@ -121,6 +133,6 @@ public class DatabaseManager {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL);
+        return DriverManager.getConnection(url);
     }
 }

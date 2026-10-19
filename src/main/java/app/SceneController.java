@@ -38,7 +38,11 @@ public class SceneController {
             // Store controller reference
             controllers.put(fxml, loader.getController());
 
-            Scene scene = new Scene(root);
+            // Keep the current window size when switching screens
+            Scene current = stage.getScene();
+            Scene scene = current == null
+                    ? new Scene(root)
+                    : new Scene(root, current.getWidth(), current.getHeight());
             stage.setScene(scene);
             stage.show();
 

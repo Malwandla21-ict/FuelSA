@@ -4,14 +4,16 @@ import app.SceneController;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
+import javafx.scene.control.Label;
+import app.ui.Ui;
+import app.ui.Ui.MessageType;
 
 public class ForgotController {
 
     @FXML private TextField txtUsernameOrEmail;
     @FXML private PasswordField txtNewPassword;
     @FXML private PasswordField txtConfirmPassword;
-    @FXML private Text txtMessage;
+    @FXML private Label lblMessage;
 
     @FXML
     private void onReset() {
@@ -20,28 +22,27 @@ public class ForgotController {
         String confirmPassword = txtConfirmPassword.getText();
 
         if (userInput.isEmpty()) {
-            txtMessage.setText("Please enter your username or email.");
+            Ui.showMessage(lblMessage, "Please enter your username or email.", MessageType.ERROR);
             return;
         }
 
         if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            txtMessage.setText("Please enter and confirm your new password.");
+            Ui.showMessage(lblMessage, "Please enter and confirm your new password.", MessageType.ERROR);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            txtMessage.setText("Passwords do not match.");
+            Ui.showMessage(lblMessage, "Passwords do not match.", MessageType.ERROR);
             return;
         }
 
         if (newPassword.length() < 6) {
-            txtMessage.setText("Password must be at least 6 characters.");
+            Ui.showMessage(lblMessage, "Password must be at least 6 characters.", MessageType.ERROR);
             return;
         }
 
-        // Simulate reset success
-        txtMessage.setStyle("-fx-fill: green;");
-        txtMessage.setText("✅ Password reset successful (mock). You may now log in.");
+        // Real password reset is not implemented yet - never pretend it worked
+        Ui.showMessage(lblMessage, "Password reset is not available yet. Please contact the FuelSA admin.", MessageType.INFO);
     }
 
     @FXML

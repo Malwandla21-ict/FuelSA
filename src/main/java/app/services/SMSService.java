@@ -124,6 +124,11 @@ public class SMSService {
             return;
         }
 
+        if (app.database.DemoData.isActive()) {
+            System.out.println("ℹ Demo mode - SMS to " + recipientType + " not sent: " + message);
+            return;
+        }
+
         if (!isConfigured()) {
             System.out.println("ℹ SMS disabled (BULKSMS_TOKEN_ID / BULKSMS_TOKEN_SECRET not set) - skipped message to " + recipientType);
             return;

@@ -11,6 +11,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
     <javafx.version>21</javafx.version>
+    <ikonli.version>12.3.1</ikonli.version>
+    <app.args></app.args>
   </properties>
 
   <dependencies>
@@ -29,7 +31,28 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.50.3.0</version>
     </dependency>
+    <!-- Icon fonts (Material Design Icons) usable from FXML via FontIcon -->
+    <dependency>
+      <groupId>org.kordamp.ikonli</groupId>
+      <artifactId>ikonli-javafx</artifactId>
+      <version>${ikonli.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kordamp.ikonli</groupId>
+      <artifactId>ikonli-materialdesign2-pack</artifactId>
+      <version>${ikonli.version}</version>
+    </dependency>
   </dependencies>
+
+  <profiles>
+    <!-- mvn javafx:run -Pdemo : starts the app on a separate database full of sample data -->
+    <profile>
+      <id>demo</id>
+      <properties>
+        <app.args>--demo</app.args>
+      </properties>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -39,6 +62,7 @@
         <version>0.0.8</version>
         <configuration>
           <mainClass>app.Main</mainClass>
+          <commandlineArgs>${app.args}</commandlineArgs>
         </configuration>
       </plugin>
     </plugins>

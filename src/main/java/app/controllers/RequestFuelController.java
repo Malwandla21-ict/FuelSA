@@ -1,27 +1,38 @@
 package app.controllers;
 
 import app.SceneController;
+import app.database.DemoData;
 import app.database.FuelRequestDAO;
 import app.models.User;
 import app.services.SMSService;
+import app.ui.Ui;
+import app.ui.Ui.MessageType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 public class RequestFuelController {
 
     @FXML private ComboBox<String> cbMake, cbModel;
-    @FXML private TextField tfCarName, tfFuelCapacity, tfFuelAmount;
-    @FXML private TextArea taDetails;
-    @FXML private Button btnRefreshPrices;
-    @FXML private Text txtPriceInfo, txtTotalCost;
+    @FXML private TextField tfCarName, tfFuelCapacity;
+    @FXML private Hyperlink btnRefreshPrices;
+    @FXML private Label lblInitials, lblUserName, lblGreeting, lblRegistration;
+    @FXML private Label lblPricePerLitre, lblLitres, lblEstimate, lblFeedback;
+    @FXML private VBox recentList;
 
-    private final double PRICE_PER_LITER = 20.15;
+    private static final double PRICE_PER_LITER = 20.15;
+    private static final int RECENT_LIMIT = 5;
+
     // Saved car details are stored per user so one person never sees another's car
     private Preferences prefs = Preferences.userNodeForPackage(RequestFuelController.class).node("guest");
     private User currentUser;
@@ -32,41 +43,46 @@ public class RequestFuelController {
         Object userData = SceneController.getData("request_fuel");
         if (userData instanceof User) {
             this.currentUser = (User) userData;
-            System.out.println("User logged in: " + currentUser.getFirstName() + " " + currentUser.getLastName());
-            prefs = Preferences.userNodeForPackage(RequestFuelController.class).node("user-" + currentUser.getId());
+            // Demo users get their own namespace so they never share saved cars with real user ids
+            String prefix = DemoData.isActive() ? "demo-user-" : "user-";
+            prefs = Preferences.userNodeForPackage(RequestFuelController.class).node(prefix + currentUser.getId());
         }
+        showUser();
 
-        // SAFE INITIALIZATION - check if components exist first
-        if (cbMake != null) {
-            loadCarMakes();
-            cbMake.setOnAction(e -> {
-                savePref("carMake", cbMake.getValue());
-                loadModels();
-            });
-        }
-
-        if (cbModel != null) {
-            cbModel.setOnAction(e -> savePref("carModel", cbModel.getValue()));
-        }
-
-        if (tfCarName != null) {
-            tfCarName.textProperty().addListener((obs, oldVal, newVal) -> savePref("carName", newVal));
-        }
-
-        if (tfFuelCapacity != null) {
-            tfFuelCapacity.textProperty().addListener((obs, oldVal, newVal) -> savePref("fuelCapacity", newVal));
-        }
-
-        if (btnRefreshPrices != null) {
-            btnRefreshPrices.setOnAction(e -> refreshFuelPrices());
-        }
+        loadCarMakes();
+        cbMake.setOnAction(e -> {
+            savePref("carMake", cbMake.getValue());
+            loadModels();
+        });
+        cbModel.setOnAction(e -> savePref("carModel", cbModel.getValue()));
+        tfCarName.textProperty().addListener((obs, oldVal, newVal) -> savePref("carName", newVal));
+        tfFuelCapacity.textProperty().addListener((obs, oldVal, newVal) -> {
+            savePref("fuelCapacity", newVal);
+            updateEstimate();
+        });
+        btnRefreshPrices.setOnAction(e -> refreshFuelPrices());
 
         loadSavedCarInfo();
-        loadCustomCars(); // Load previously saved custom cars
+        loadCustomCars();
 
-        if (txtPriceInfo != null) {
-            txtPriceInfo.setText("Current price: R" + PRICE_PER_LITER + " per liter");
+        lblPricePerLitre.setText(Ui.money(PRICE_PER_LITER));
+        updateEstimate();
+        loadRecentRequests();
+    }
+
+    private void showUser() {
+        if (currentUser == null) {
+            lblUserName.setText("Guest");
+            lblInitials.setText("?");
+            lblRegistration.setVisible(false);
+            return;
         }
+        lblUserName.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+        lblInitials.setText(Ui.initials(currentUser.getFirstName(), currentUser.getLastName()));
+        lblGreeting.setText("Hi " + currentUser.getFirstName() + ", tell us about your car and how much fuel you need.");
+
+        String reg = currentUser.getCarReg();
+        lblRegistration.setText(reg == null || reg.isBlank() ? "No registration on file" : reg);
     }
 
     private void loadCarMakes() {
@@ -81,15 +97,11 @@ public class RequestFuelController {
                 cbMake.getItems().add(el.getAttribute("name"));
             }
         } catch (Exception ex) {
-            if (taDetails != null) {
-                taDetails.setText("Error loading car makes: " + ex.getMessage());
-            }
+            Ui.showMessage(lblFeedback, "Could not load car makes: " + ex.getMessage(), MessageType.ERROR);
         }
     }
 
     private void loadModels() {
-        if (cbModel == null) return;
-
         cbModel.getItems().clear();
         String make = cbMake.getValue();
         if (make == null) return;
@@ -111,21 +123,15 @@ public class RequestFuelController {
                 }
             }
         } catch (Exception ex) {
-            if (taDetails != null) {
-                taDetails.setText("Error loading models: " + ex.getMessage());
-            }
+            Ui.showMessage(lblFeedback, "Could not load models: " + ex.getMessage(), MessageType.ERROR);
         }
     }
 
-    // NEW METHOD: Load custom cars from preferences
+    // Load custom cars from preferences
     private void loadCustomCars() {
-        if (cbModel == null) return;
-
-        // Load custom cars from preferences
         String customCars = prefs.get("customCars", "");
         if (!customCars.isEmpty()) {
-            String[] cars = customCars.split(";;");
-            for (String car : cars) {
+            for (String car : customCars.split(";;")) {
                 if (!car.trim().isEmpty() && !cbModel.getItems().contains(car.trim())) {
                     cbModel.getItems().add(car.trim());
                 }
@@ -133,20 +139,16 @@ public class RequestFuelController {
         }
     }
 
-    // NEW METHOD: Save custom cars to preferences
+    // Save custom cars to preferences
     private void saveCustomCar(String carName) {
         if (carName == null || carName.trim().isEmpty()) return;
 
-        // Get existing custom cars
         String customCars = prefs.get("customCars", "");
         StringBuilder updatedCars = new StringBuilder();
-
         if (!customCars.isEmpty()) {
             updatedCars.append(customCars).append(";;");
         }
         updatedCars.append(carName.trim());
-
-        // Save back to preferences
         prefs.put("customCars", updatedCars.toString());
     }
 
@@ -165,67 +167,75 @@ public class RequestFuelController {
         String savedMake = prefs.get("carMake", "");
         String savedModel = prefs.get("carModel", "");
 
-        if (tfCarName != null && !savedCar.isEmpty()) tfCarName.setText(savedCar);
-        if (tfFuelCapacity != null && !savedFuelCap.isEmpty()) tfFuelCapacity.setText(savedFuelCap);
-        if (cbMake != null && !savedMake.isEmpty()) cbMake.setValue(savedMake);
-        if (cbModel != null && !savedModel.isEmpty()) {
+        // First visit: start from the car on the user's profile
+        if (savedMake.isEmpty() && currentUser != null && currentUser.getCarMake() != null) {
+            savedMake = currentUser.getCarMake();
+            savedModel = currentUser.getCarModel() == null ? "" : currentUser.getCarModel();
+        }
+
+        if (!savedCar.isEmpty()) tfCarName.setText(savedCar);
+        if (!savedFuelCap.isEmpty()) tfFuelCapacity.setText(savedFuelCap);
+        if (!savedMake.isEmpty()) {
+            cbMake.setValue(savedMake);
             loadModels();
-            cbModel.setValue(savedModel);
+        }
+        if (!savedModel.isEmpty()) cbModel.setValue(savedModel);
+    }
+
+    /** Parses the litres field; returns -1 when it is empty or not a positive number. */
+    private double parseLitres() {
+        try {
+            double litres = Double.parseDouble(tfFuelCapacity.getText().trim().replace(',', '.'));
+            return litres > 0 ? litres : -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 
-    @FXML
-    private void refreshFuelPrices() {
-        String info = "Latest (mock) prices:\nPetrol 95: R20.15 / L\nDiesel 0.05%: R19.10 / L\n(For live prices embed AA script or call an API.)";
-        if (txtPriceInfo != null) {
-            txtPriceInfo.setText(info);
+    private void updateEstimate() {
+        double litres = parseLitres();
+        if (litres > 0) {
+            lblLitres.setText(Ui.litres(litres));
+            lblEstimate.setText(Ui.money(litres * PRICE_PER_LITER));
+        } else {
+            lblLitres.setText("—");
+            lblEstimate.setText(Ui.money(0));
         }
+    }
+
+    private void refreshFuelPrices() {
+        lblPricePerLitre.setText(Ui.money(PRICE_PER_LITER));
+        Ui.showMessage(lblFeedback, "Prices are up to date: Petrol 95 " + Ui.money(PRICE_PER_LITER) + "/L (sample prices).", MessageType.INFO);
     }
 
     @FXML
     private void onRequestFuel() {
-        if (cbMake == null || cbModel == null || tfCarName == null || tfFuelCapacity == null || taDetails == null) {
-            System.out.println("UI components not loaded properly");
-            return;
-        }
-
-        // Check if user is logged in
         if (currentUser == null) {
-            taDetails.setText("Error: No user logged in. Please login first.");
+            Ui.showMessage(lblFeedback, "You are not signed in. Please sign in first.", MessageType.ERROR);
             return;
         }
 
         String make = cbMake.getValue();
         String model = cbModel.getValue();
         String customCar = tfCarName.getText().trim();
-        String fuelCapStr = tfFuelCapacity.getText();
 
-        // FIXED LOGIC: Either dropdown selection OR custom car, not both required
+        // Either a dropdown selection OR a custom car is enough
         boolean hasDropdownSelection = (make != null && model != null && !make.isEmpty() && !model.isEmpty());
         boolean hasCustomCar = !customCar.isEmpty();
 
         if (!hasDropdownSelection && !hasCustomCar) {
-            taDetails.setText("Please either select a car from the dropdown OR enter your car name.");
+            Ui.showMessage(lblFeedback, "Choose your car's make and model, or type your car in the box.", MessageType.ERROR);
             return;
         }
 
-        if (fuelCapStr.isEmpty()) {
-            taDetails.setText("Please enter fuel capacity.");
-            return;
-        }
-
-        double fuelCap;
-        try {
-            fuelCap = Double.parseDouble(fuelCapStr);
-            if (fuelCap <= 0) throw new NumberFormatException();
-        } catch (NumberFormatException e) {
-            taDetails.setText("Fuel capacity must be a positive number.");
+        double fuelCap = parseLitres();
+        if (fuelCap <= 0) {
+            Ui.showMessage(lblFeedback, "Enter how many litres you need (a number above 0).", MessageType.ERROR);
             return;
         }
 
         double totalPrice = fuelCap * PRICE_PER_LITER;
 
-        // Use ACTUAL user data
         String customerName = currentUser.getFirstName() + " " + currentUser.getLastName();
         String customerPhone = currentUser.getPhoneNumber();
 
@@ -235,91 +245,109 @@ public class RequestFuelController {
             registration = "Not provided";
         }
 
-        // Determine vehicle description
         String vehicleDescription;
-
         if (hasDropdownSelection) {
             vehicleDescription = make + " " + model;
         } else {
             vehicleDescription = customCar;
-
-            // If using custom car, save it for future use
             saveCustomCar(customCar);
         }
 
-        // Save to database and send SMS
         FuelRequestDAO fuelDAO = new FuelRequestDAO();
         SMSService smsService = new SMSService();
 
-        // Use ACTUAL user data instead of hardcoded values
         boolean saved = fuelDAO.createFuelRequest(
-                customerName,       // ACTUAL customer name
-                customerPhone,      // ACTUAL customer phone
-                vehicleDescription, // Either dropdown selection OR custom car
-                registration,       // Use model for dropdown, custom car for manual entry
+                customerName,
+                customerPhone,
+                vehicleDescription,
+                registration,
                 "petrol",
                 fuelCap,
                 totalPrice,
-                currentUser.getId()  // ACTUAL user ID
+                currentUser.getId()
         );
 
         if (saved) {
-            // Send SMS to admin with ACTUAL customer info
-            smsService.sendAdminAlert(
-                    customerName,      // ACTUAL customer name
-                    vehicleDescription,
-                    registration,
-                    "petrol",
-                    fuelCap,
-                    totalPrice
-            );
+            smsService.sendAdminAlert(customerName, vehicleDescription, registration, "petrol", fuelCap, totalPrice);
+            smsService.sendCustomerConfirmation(customerPhone, currentUser.getFirstName(), "submitted");
 
-            // Send SMS to ACTUAL customer
-            smsService.sendCustomerConfirmation(
-                    customerPhone,        // ACTUAL customer phone
-                    currentUser.getFirstName(), // ACTUAL first name
-                    "submitted"           // status
-            );
-
-            String output = String.format(
-                    "✅ Fuel request submitted!\nCar: %s\nCapacity: %.2f L\nEstimated Cost: R%.2f\n\nSMS sent to you and admin for approval.",
-                    vehicleDescription, fuelCap, totalPrice
-            );
-            taDetails.setText(output);
+            Ui.showMessage(lblFeedback, "Request sent! " + Ui.litres(fuelCap) + " for your " + vehicleDescription
+                    + " (" + Ui.money(totalPrice) + "). We'll SMS you once it's reviewed.", MessageType.SUCCESS);
+            loadRecentRequests();
         } else {
-            taDetails.setText("Error submitting request. Please try again.");
+            Ui.showMessage(lblFeedback, "Something went wrong submitting your request. Please try again.", MessageType.ERROR);
         }
+    }
+
+    private void loadRecentRequests() {
+        recentList.getChildren().clear();
+        if (currentUser == null) {
+            recentList.getChildren().add(Ui.emptyState("mdi2c-clipboard-text-outline", "Sign in to see your requests."));
+            return;
+        }
+
+        List<String[]> requests = new FuelRequestDAO().getRequestsForUser(currentUser.getId(), RECENT_LIMIT);
+        if (requests.isEmpty()) {
+            recentList.getChildren().add(Ui.emptyState("mdi2c-clipboard-text-outline", "No requests yet. Your first one will show up here."));
+            return;
+        }
+
+        for (int i = 0; i < requests.size(); i++) {
+            String[] r = requests.get(i);
+            HBox row = requestRow(r);
+            if (i == requests.size() - 1) row.getStyleClass().add("last");
+            recentList.getChildren().add(row);
+        }
+    }
+
+    // Columns: 3 vehicle, 6 litres, 7 total, 8 status, 9 date
+    private HBox requestRow(String[] r) {
+        StackPane icon = new StackPane(new FontIcon("mdi2g-gas-station-outline"));
+        icon.getStyleClass().add("row-icon");
+
+        Label title = new Label(Ui.litres(r[6]) + " · " + r[3]);
+        title.getStyleClass().add("row-title");
+        Label sub = new Label(Ui.date(r[9]));
+        sub.getStyleClass().add("row-sub");
+        VBox text = new VBox(2, title, sub);
+        text.setMinWidth(0);
+        HBox.setHgrow(text, javafx.scene.layout.Priority.ALWAYS);
+
+        Label amount = new Label(Ui.money(r[7]));
+        amount.getStyleClass().add("row-amount");
+        VBox right = new VBox(4, amount, Ui.badge(r[8]));
+        right.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        right.setMinWidth(Region.USE_PREF_SIZE);
+
+        HBox row = new HBox(icon, text, right);
+        row.getStyleClass().add("list-row");
+        return row;
     }
 
     @FXML
     private void onAddCar() {
-        if (tfCarName == null || cbModel == null || taDetails == null) return;
-
         String newCar = tfCarName.getText().trim();
         if (!newCar.isEmpty()) {
-            // Add to dropdown if not already there
             if (!cbModel.getItems().contains(newCar)) {
                 cbModel.getItems().add(newCar);
-                // Save to persistent storage
                 saveCustomCar(newCar);
             }
 
-            // Select the newly added car
             cbModel.setValue(newCar);
             tfCarName.clear();
-            taDetails.setText("✅ Car added to your list: " + newCar);
+            Ui.showMessage(lblFeedback, "Added \"" + newCar + "\" to your cars.", MessageType.SUCCESS);
             savePref("carModel", newCar);
         } else {
-            taDetails.setText("⚠ Enter a car name to add.");
+            Ui.showMessage(lblFeedback, "Type a car name first, then click Add.", MessageType.ERROR);
         }
     }
 
     @FXML
     private void onClearCarInfo() {
-        if (cbMake != null) cbMake.getSelectionModel().clearSelection();
-        if (cbModel != null) cbModel.getItems().clear();
-        if (tfCarName != null) tfCarName.clear();
-        if (tfFuelCapacity != null) tfFuelCapacity.clear();
+        cbMake.getSelectionModel().clearSelection();
+        cbModel.getItems().clear();
+        tfCarName.clear();
+        tfFuelCapacity.clear();
 
         // Reload default models after clearing
         loadModels();
@@ -330,9 +358,7 @@ public class RequestFuelController {
         prefs.remove("carName");
         prefs.remove("fuelCapacity");
 
-        if (taDetails != null) {
-            taDetails.setText("🗑️ Car information cleared.");
-        }
+        Ui.showMessage(lblFeedback, "Car details cleared.", MessageType.INFO);
     }
 
     @FXML

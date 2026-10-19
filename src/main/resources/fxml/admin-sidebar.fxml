@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Navigation shared by every admin page (included with fx:id="sidebar") -->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="app.controllers.AdminSidebarController"
+      styleClass="sidebar">
+
+    <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 0 6 6 6;">
+        <StackPane styleClass="logo-chip">
+            <FontIcon iconLiteral="mdi2g-gas-station" />
+        </StackPane>
+        <VBox>
+            <Label text="FuelSA" styleClass="sidebar-brand" />
+            <Label text="Admin console" styleClass="sidebar-sub" />
+        </VBox>
+    </HBox>
+
+    <Label text="MENU" styleClass="sidebar-section" />
+
+    <Button fx:id="navDashboard" text="Dashboard" onAction="#goDashboard" styleClass="nav-item" maxWidth="Infinity">
+        <graphic><FontIcon iconLiteral="mdi2v-view-dashboard-outline" /></graphic>
+    </Button>
+    <!-- Graphic-only so the count pill can sit on the right edge -->
+    <Button fx:id="navPending" onAction="#goPending" styleClass="nav-item" maxWidth="Infinity" contentDisplay="GRAPHIC_ONLY">
+        <graphic>
+            <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="Infinity">
+                <FontIcon iconLiteral="mdi2c-clock-outline" />
+                <Label text="Pending requests" styleClass="nav-text" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="-Infinity" />
+                <Label fx:id="pendingCount" styleClass="badge, sidebar-count" visible="false" />
+            </HBox>
+        </graphic>
+    </Button>
+    <Button fx:id="navHistory" text="Request history" onAction="#goHistory" styleClass="nav-item" maxWidth="Infinity">
+        <graphic><FontIcon iconLiteral="mdi2h-history" /></graphic>
+    </Button>
+    <Button fx:id="navAnalytics" text="Analytics" onAction="#goAnalytics" styleClass="nav-item" maxWidth="Infinity">
+        <graphic><FontIcon iconLiteral="mdi2c-chart-box-outline" /></graphic>
+    </Button>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <HBox styleClass="sidebar-user">
+        <StackPane styleClass="avatar">
+            <Label text="AD" />
+        </StackPane>
+        <VBox>
+            <Label text="Administrator" styleClass="sidebar-user-name" />
+            <Label text="Signed in" styleClass="sidebar-sub" />
+        </VBox>
+    </HBox>
+
+    <Button text="Sign out" onAction="#logout" styleClass="nav-item" maxWidth="Infinity">
+        <graphic><FontIcon iconLiteral="mdi2l-logout" /></graphic>
+    </Button>
+</VBox>

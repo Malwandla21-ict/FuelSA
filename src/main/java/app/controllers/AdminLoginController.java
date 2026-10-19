@@ -2,6 +2,8 @@ package app.controllers;
 
 import app.SceneController;
 import app.database.AdminDAO;
+import app.ui.Ui;
+import app.ui.Ui.MessageType;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
@@ -28,8 +30,7 @@ public class AdminLoginController {
     @FXML
     private void initialize() {
         if (!adminDAO.hasAnyAdmin()) {
-            statusLabel.setText("No admin account exists yet. Enter a username and click LOGIN to create one.");
-            statusLabel.setStyle("-fx-text-fill: #2563eb;");
+            Ui.showMessage(statusLabel, "No admin account exists yet. Enter a username and click Sign in to create one.", MessageType.INFO);
         }
     }
 
@@ -44,8 +45,7 @@ public class AdminLoginController {
         }
 
         if (username.isEmpty() || password.isEmpty()) {
-            statusLabel.setText("Please fill all fields!");
-            statusLabel.setStyle("-fx-text-fill: #e74c3c;");
+            Ui.showMessage(statusLabel, "Please enter your username and password.", MessageType.ERROR);
             return;
         }
 
@@ -62,11 +62,10 @@ public class AdminLoginController {
                     return;
                 }
             }
-            statusLabel.setText("Login successful!");
-            statusLabel.setStyle("-fx-text-fill: #27ae60;");
+            Ui.hideMessage(statusLabel);
             SceneController.show("admin-dashboard");
         } else {
-            showError("Invalid admin credentials!");
+            showError("Incorrect admin username or password.");
         }
     }
 
@@ -85,8 +84,7 @@ public class AdminLoginController {
         }
 
         if (adminDAO.createAdmin(username, result.get()[0], result.get()[1])) {
-            statusLabel.setText("Admin account created!");
-            statusLabel.setStyle("-fx-text-fill: #27ae60;");
+            Ui.hideMessage(statusLabel);
             SceneController.show("admin-dashboard");
         } else {
             showError("Could not create the admin account.");
@@ -147,8 +145,7 @@ public class AdminLoginController {
     }
 
     private void showError(String message) {
-        statusLabel.setText(message);
-        statusLabel.setStyle("-fx-text-fill: #e74c3c;");
+        Ui.showMessage(statusLabel, message, MessageType.ERROR);
     }
 
     @FXML

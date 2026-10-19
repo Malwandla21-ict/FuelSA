@@ -1,85 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane prefHeight="600.0" prefWidth="800.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.AdminAnalyticsController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="app.controllers.AdminAnalyticsController"
+            stylesheets="@../css/styles.css">
 
-    <top>
-        <VBox styleClass="header" alignment="CENTER">
-            <Label text="ANALYTICS DASHBOARD" styleClass="header-title">
-                <padding>
-                    <Insets bottom="10.0" top="20.0" />
-                </padding>
-            </Label>
-            <Label text="Real-time fuel request statistics and financial analytics" styleClass="header-subtitle">
-                <padding>
-                    <Insets bottom="20.0" />
-                </padding>
-            </Label>
-        </VBox>
-    </top>
+    <left>
+        <fx:include fx:id="sidebar" source="admin-sidebar.fxml" />
+    </left>
 
     <center>
-        <VBox spacing="25.0" style="-fx-padding: 30;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <VBox styleClass="page">
 
-            <!-- Assignment Requirements Section -->
-            <VBox spacing="20.0" styleClass="card">
-                <Label text="📊 Assignment Analytics Requirements" style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #1e40af;" />
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="4">
+                        <Label text="Analytics" styleClass="h1" />
+                        <Label text="Revenue and request statistics. Totals include approved requests only." styleClass="subtitle" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="Refresh" onAction="#handleRefresh" styleClass="ghost">
+                        <graphic><FontIcon iconLiteral="mdi2r-refresh" /></graphic>
+                    </Button>
+                </HBox>
 
-                <HBox spacing="30.0" alignment="CENTER_LEFT">
-                    <VBox spacing="15.0" prefWidth="300">
-                        <Label text="1.5.3 - Total Money Paid for Fuel:" styleClass="form-label" />
-                        <Label text="1.5.4 - Customer Transaction Summary:" styleClass="form-label" />
-                        <Label text="1.5.5 - Total Profit Made:" styleClass="form-label" />
+                <!-- Headline numbers (assignment items 1.5.3 and 1.5.5) -->
+                <HBox spacing="18">
+                    <HBox styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon, green"><FontIcon iconLiteral="mdi2c-cash-multiple" /></StackPane>
+                        <VBox spacing="2">
+                            <Label text="Total paid for fuel" styleClass="stat-label" />
+                            <Label fx:id="totalMoneyLabel" text="R0.00" styleClass="stat-value" />
+                            <Label text="1.5.3 · approved requests" styleClass="stat-caption" />
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon, violet"><FontIcon iconLiteral="mdi2t-trending-up" /></StackPane>
+                        <VBox spacing="2">
+                            <Label text="Total profit" styleClass="stat-label" />
+                            <Label fx:id="profitLabel" text="R0.00" styleClass="stat-value" />
+                            <Label text="1.5.5 · 15% margin" styleClass="stat-caption" />
+                        </VBox>
+                    </HBox>
+                    <HBox styleClass="stat-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon, blue"><FontIcon iconLiteral="mdi2c-clipboard-text-outline" /></StackPane>
+                        <VBox spacing="2">
+                            <Label text="Requests" styleClass="stat-label" />
+                            <Label fx:id="totalRequestsLabel" text="0" styleClass="stat-value" />
+                            <HBox spacing="10">
+                                <Label fx:id="approvedRequestsLabel" text="0" styleClass="stat-caption" />
+                                <Label fx:id="pendingRequestsLabel" text="0" styleClass="stat-caption" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </HBox>
+
+                <HBox spacing="18">
+                    <!-- Weekly revenue chart -->
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="6">
+                        <Label text="Approved revenue per week" styleClass="card-title">
+                            <graphic><FontIcon iconLiteral="mdi2c-chart-bar" /></graphic>
+                        </Label>
+                        <Label fx:id="lblChartCaption" text="Last 8 weeks" styleClass="card-subtitle" />
+                        <BarChart fx:id="revenueChart" legendVisible="false" animated="false"
+                                  barGap="0" categoryGap="18" prefHeight="300" minHeight="260"
+                                  horizontalGridLinesVisible="true" verticalGridLinesVisible="false">
+                            <xAxis><CategoryAxis side="BOTTOM" tickMarkVisible="false" /></xAxis>
+                            <yAxis><NumberAxis side="LEFT" tickMarkVisible="false" minorTickVisible="false" /></yAxis>
+                        </BarChart>
                     </VBox>
 
-                    <VBox spacing="15.0">
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <Label fx:id="totalMoneyLabel" text="R0.00" styleClass="stat-value" />
-                        </HBox>
+                    <VBox spacing="18" minWidth="320" prefWidth="340" maxWidth="360">
+                        <!-- Assignment item 1.5.4 -->
+                        <VBox styleClass="card">
+                            <Label text="Customer lookup" styleClass="card-title">
+                                <graphic><FontIcon iconLiteral="mdi2a-account-search-outline" /></graphic>
+                            </Label>
+                            <Label text="1.5.4 · total spent by one customer" styleClass="card-subtitle" />
+                            <HBox spacing="10">
+                                <HBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <FontIcon iconLiteral="mdi2a-account-outline" />
+                                    <TextField fx:id="customerNameField" promptText="Full name, e.g. Thandi Mokoena"
+                                               onAction="#handleCalculateCustomerTotal" HBox.hgrow="ALWAYS" />
+                                </HBox>
+                                <Button text="Look up" onAction="#handleCalculateCustomerTotal" styleClass="primary" minWidth="-Infinity" />
+                            </HBox>
+                            <Separator />
+                            <VBox spacing="2">
+                                <Label fx:id="lblCustomerCaption" text="Total spent" styleClass="summary-key" />
+                                <Label fx:id="customerTotalLabel" text="R0.00" styleClass="total-value" />
+                            </VBox>
+                        </VBox>
 
-                        <HBox spacing="10.0" alignment="CENTER_LEFT">
-                            <TextField fx:id="customerNameField" promptText="Enter customer name" prefWidth="200.0" styleClass="text-field" />
-                            <Button onAction="#handleCalculateCustomerTotal" text="Calculate" styleClass="btn-primary" />
-                            <Label fx:id="customerTotalLabel" text="R0.00" styleClass="stat-value" style="-fx-font-size: 16;" />
-                        </HBox>
-
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <Label fx:id="profitLabel" text="R0.00" styleClass="stat-value" />
-                        </HBox>
+                        <VBox styleClass="card" spacing="14">
+                            <Label text="Top customers" styleClass="card-title">
+                                <graphic><FontIcon iconLiteral="mdi2t-trophy-outline" /></graphic>
+                            </Label>
+                            <VBox fx:id="topCustomers" spacing="14" />
+                        </VBox>
                     </VBox>
                 </HBox>
             </VBox>
-
-            <!-- Analytics Cards -->
-            <HBox spacing="20.0" alignment="CENTER">
-                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
-                    <Label text="📈 Total Requests" styleClass="stat-label" />
-                    <Label fx:id="totalRequestsLabel" text="0" styleClass="stat-value" />
-                    <Label text="All time requests" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
-                </VBox>
-
-                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
-                    <Label text="✅ Approved" styleClass="stat-label" />
-                    <Label fx:id="approvedRequestsLabel" text="0" styleClass="stat-value" />
-                    <Label text="Completed requests" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
-                </VBox>
-
-                <VBox alignment="CENTER" prefWidth="200.0" styleClass="stat-card">
-                    <Label text="⏳ Pending" styleClass="stat-label" />
-                    <Label fx:id="pendingRequestsLabel" text="0" styleClass="stat-value" />
-                    <Label text="Awaiting approval" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-padding: 5 0 0 0;" />
-                </VBox>
-            </HBox>
-
-            <!-- Action Buttons -->
-            <HBox spacing="15.0" alignment="CENTER">
-                <Button onAction="#handleRefresh" text="🔄 Refresh Analytics" styleClass="btn-primary" />
-                <Button onAction="#handleBack" text="← Back to Dashboard" styleClass="btn-secondary" />
-            </HBox>
-        </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>
