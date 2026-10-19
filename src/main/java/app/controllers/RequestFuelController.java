@@ -22,7 +22,8 @@ public class RequestFuelController {
     @FXML private Text txtPriceInfo, txtTotalCost;
 
     private final double PRICE_PER_LITER = 20.15;
-    private final Preferences prefs = Preferences.userNodeForPackage(RequestFuelController.class);
+    // Saved car details are stored per user so one person never sees another's car
+    private Preferences prefs = Preferences.userNodeForPackage(RequestFuelController.class).node("guest");
     private User currentUser;
 
     @FXML
@@ -32,27 +33,28 @@ public class RequestFuelController {
         if (userData instanceof User) {
             this.currentUser = (User) userData;
             System.out.println("User logged in: " + currentUser.getFirstName() + " " + currentUser.getLastName());
+            prefs = Preferences.userNodeForPackage(RequestFuelController.class).node("user-" + currentUser.getId());
         }
 
         // SAFE INITIALIZATION - check if components exist first
         if (cbMake != null) {
             loadCarMakes();
             cbMake.setOnAction(e -> {
-                prefs.put("carMake", cbMake.getValue());
+                savePref("carMake", cbMake.getValue());
                 loadModels();
             });
         }
 
         if (cbModel != null) {
-            cbModel.setOnAction(e -> prefs.put("carModel", cbModel.getValue()));
+            cbModel.setOnAction(e -> savePref("carModel", cbModel.getValue()));
         }
 
         if (tfCarName != null) {
-            tfCarName.textProperty().addListener((obs, oldVal, newVal) -> prefs.put("carName", newVal));
+            tfCarName.textProperty().addListener((obs, oldVal, newVal) -> savePref("carName", newVal));
         }
 
         if (tfFuelCapacity != null) {
-            tfFuelCapacity.textProperty().addListener((obs, oldVal, newVal) -> prefs.put("fuelCapacity", newVal));
+            tfFuelCapacity.textProperty().addListener((obs, oldVal, newVal) -> savePref("fuelCapacity", newVal));
         }
 
         if (btnRefreshPrices != null) {
@@ -148,6 +150,15 @@ public class RequestFuelController {
         prefs.put("customCars", updatedCars.toString());
     }
 
+    // Preferences.put throws on null, which happens whenever a ComboBox is cleared
+    private void savePref(String key, String value) {
+        if (value == null || value.isEmpty()) {
+            prefs.remove(key);
+        } else {
+            prefs.put(key, value);
+        }
+    }
+
     private void loadSavedCarInfo() {
         String savedCar = prefs.get("carName", "");
         String savedFuelCap = prefs.get("fuelCapacity", "");
@@ -218,16 +229,19 @@ public class RequestFuelController {
         String customerName = currentUser.getFirstName() + " " + currentUser.getLastName();
         String customerPhone = currentUser.getPhoneNumber();
 
+        // Registration is the user's number plate from their profile, not the car model
+        String registration = currentUser.getCarReg();
+        if (registration == null || registration.isBlank()) {
+            registration = "Not provided";
+        }
+
         // Determine vehicle description
         String vehicleDescription;
-        String registration;
 
         if (hasDropdownSelection) {
             vehicleDescription = make + " " + model;
-            registration = model;
         } else {
             vehicleDescription = customCar;
-            registration = customCar;
 
             // If using custom car, save it for future use
             saveCustomCar(customCar);
@@ -294,7 +308,7 @@ public class RequestFuelController {
             cbModel.setValue(newCar);
             tfCarName.clear();
             taDetails.setText("✅ Car added to your list: " + newCar);
-            prefs.put("carModel", newCar);
+            savePref("carModel", newCar);
         } else {
             taDetails.setText("⚠ Enter a car name to add.");
         }

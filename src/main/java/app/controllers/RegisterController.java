@@ -80,7 +80,7 @@ public class RegisterController {
         // Validate all fields
         if (firstName.getText().isEmpty() || lastName.getText().isEmpty() ||
                 email.getText().isEmpty() || idNumber.getText().isEmpty() ||
-                username.getText().isEmpty() || password.getText().isEmpty() ||
+                username.getText().trim().isEmpty() || password.getText().isEmpty() ||
                 phoneNumber.getText().isEmpty()) {
             txtMessage.setText("Please fill in all required fields.");
             return;
@@ -98,7 +98,7 @@ public class RegisterController {
         }
 
         // Check if username already exists
-        if (userDAO.userExists(username.getText())) {
+        if (userDAO.userExists(username.getText().trim())) {
             txtMessage.setText("Username already exists.");
             return;
         }
@@ -141,7 +141,7 @@ public class RegisterController {
             txtMessage.setText("Registered successfully! Logging you in...");
 
             // Auto-login after successful registration
-            User newUser = userDAO.getUserByUsername(username.getText());
+            User newUser = userDAO.getUserByUsername(username.getText().trim());
             if (newUser != null) {
                 // Pass the new user to the request fuel controller
                 SceneController.show("request_fuel", newUser);

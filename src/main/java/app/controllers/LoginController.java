@@ -21,7 +21,7 @@ public class LoginController {
             return;
         }
 
-        String username = tfUsername.getText();
+        String username = tfUsername.getText().trim();
         String password = pfPassword.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -30,9 +30,9 @@ public class LoginController {
         }
 
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.getUserByUsername(username);
+        User user = userDAO.authenticate(username, password);
 
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null) {
             SceneController.show("request_fuel", user);
         } else {
             showAlert("Error", "Invalid username or password.");

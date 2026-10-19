@@ -1,0 +1,9 @@
+# Copy this file to "fuelapp.properties" (same folder) and fill in your values.
+# fuelapp.properties is git-ignored - NEVER commit real credentials.
+# Environment variables with the same names take priority over this file.
+
+# BulkSMS API token (create one at https://www.bulksms.com > Settings > API Tokens).
+# Leave blank to disable SMS - the app still works, messages are just not sent.
+BULKSMS_TOKEN_ID=
+BULKSMS_TOKEN_SECRET=
+BULKSMS_SENDER_ID=FuelSA

@@ -1,9 +1,15 @@
 package app.database;
 
+import app.security.PasswordHasher;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DatabaseManager {
     private static final String URL = "jdbc:sqlite:fuel_app.db";
@@ -12,12 +18,19 @@ public class DatabaseManager {
         initializeDatabase();
     }
 
+    /** Forces the static initializer to run (call once at startup). */
+    public static void init() {}
+
     private static void initializeDatabase() {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
             createUsersTable(stmt);
+            createAdminUsersTable(stmt);
             createFuelRequestsTable(stmt);
+
+            migratePlaintextPasswords(conn, "users");
+            migratePlaintextPasswords(conn, "admin_users");
 
             System.out.println("Database initialized successfully");
 
@@ -46,6 +59,18 @@ public class DatabaseManager {
         stmt.execute(sql);
     }
 
+    private static void createAdminUsersTable(Statement stmt) throws SQLException {
+        // No default admin is inserted - the first admin is created from the admin login screen
+        String sql =
+                "CREATE TABLE IF NOT EXISTS admin_users (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "username TEXT UNIQUE NOT NULL, " +
+                        "password TEXT NOT NULL, " +
+                        "phone_number TEXT NOT NULL)";
+
+        stmt.execute(sql);
+    }
+
     private static void createFuelRequestsTable(Statement stmt) throws SQLException {
         String sql =
                 "CREATE TABLE IF NOT EXISTS fuel_requests (" +
@@ -63,6 +88,36 @@ public class DatabaseManager {
                         "FOREIGN KEY (user_id) REFERENCES users(id))";
 
         stmt.execute(sql);
+    }
+
+    /**
+     * One-time upgrade: replaces any plaintext passwords left from older versions with hashes.
+     * Table names are fixed constants above, never user input.
+     */
+    private static void migratePlaintextPasswords(Connection conn, String table) throws SQLException {
+        Map<Integer, String> plaintext = new LinkedHashMap<>();
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, password FROM " + table)) {
+            while (rs.next()) {
+                String stored = rs.getString("password");
+                if (!PasswordHasher.isHashed(stored)) {
+                    plaintext.put(rs.getInt("id"), stored);
+                }
+            }
+        }
+
+        if (plaintext.isEmpty()) {
+            return;
+        }
+
+        try (PreparedStatement pstmt = conn.prepareStatement("UPDATE " + table + " SET password = ? WHERE id = ?")) {
+            for (Map.Entry<Integer, String> row : plaintext.entrySet()) {
+                pstmt.setString(1, PasswordHasher.hash(row.getValue()));
+                pstmt.setInt(2, row.getKey());
+                pstmt.executeUpdate();
+            }
+        }
+        System.out.println("🔒 Hashed " + plaintext.size() + " plaintext password(s) in " + table);
     }
 
     public static Connection getConnection() throws SQLException {

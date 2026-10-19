@@ -1,33 +1,54 @@
 package app.services;
 
+import app.AppConfig;
 import app.database.AdminDAO;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SMSService {
-    private AdminDAO adminDAO = new AdminDAO();
     private static final String BULKSMS_URL = "https://api.bulksms.com/v1/messages";
-    private static final String TOKEN_ID = "REDACTED";
-    private static final String TOKEN_SECRET = "REDACTED";
-    private static final String SENDER_ID = "FuelSA";
+
+    // Credentials come from env vars / fuelapp.properties - never hardcode them
+    private static final String TOKEN_ID = AppConfig.get("BULKSMS_TOKEN_ID");
+    private static final String TOKEN_SECRET = AppConfig.get("BULKSMS_TOKEN_SECRET");
+    private static final String SENDER_ID = AppConfig.get("BULKSMS_SENDER_ID", "FuelSA");
+
+    // Network calls run here so the JavaFX UI thread never blocks on SMS delivery
+    private static final ExecutorService SENDER = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "sms-sender");
+        t.setDaemon(true);
+        return t;
+    });
+
+    private AdminDAO adminDAO = new AdminDAO();
+
+    public static boolean isConfigured() {
+        return TOKEN_ID != null && TOKEN_SECRET != null;
+    }
 
     /**
      * Sends SMS alert to admin about new fuel request
      */
     public void sendAdminAlert(String customerName, String vehicle, String registration,
                                String fuelType, double amount, double total) {
-        String adminPhone = adminDAO.getAdminPhone();
-        String formattedPhone = formatPhoneNumber(adminPhone);
-
         String message = String.format(
                 "FuelSA Alert: New request from %s - %s (%s). %s: %.1fL. Total: R%.2f. Please check dashboard.",
                 customerName, vehicle, registration, fuelType, amount, total
         );
 
-        sendMessage("Admin", formattedPhone, message);
+        SENDER.submit(() -> {
+            String adminPhone = adminDAO.getAdminPhone();
+            if (adminPhone == null) {
+                System.err.println("❌ No admin phone number set - admin SMS alert skipped");
+                return;
+            }
+            sendMessage("Admin", formatPhoneNumber(adminPhone), message);
+        });
     }
 
     /**
@@ -37,7 +58,7 @@ public class SMSService {
         String formattedPhone = formatPhoneNumber(customerPhone);
 
         String message = formatCustomerMessage(customerName, status);
-        sendMessage("Customer", formattedPhone, message);
+        SENDER.submit(() -> sendMessage("Customer", formattedPhone, message));
     }
 
     /**
@@ -72,7 +93,7 @@ public class SMSService {
     /**
      * Formats phone number for SMS delivery (converts 0xxx to 27xxx)
      */
-    private String formatPhoneNumber(String phone) {
+    static String formatPhoneNumber(String phone) {
         if (phone == null || phone.trim().isEmpty()) {
             System.err.println("❌ Invalid phone number: null or empty");
             return "";
@@ -100,6 +121,11 @@ public class SMSService {
     private void sendMessage(String recipientType, String toNumber, String message) {
         if (toNumber.isEmpty()) {
             System.err.println("❌ Cannot send SMS - invalid phone number for " + recipientType);
+            return;
+        }
+
+        if (!isConfigured()) {
+            System.out.println("ℹ SMS disabled (BULKSMS_TOKEN_ID / BULKSMS_TOKEN_SECRET not set) - skipped message to " + recipientType);
             return;
         }
 
@@ -138,10 +164,10 @@ public class SMSService {
             connection.setConnectTimeout(10000); // 10 second timeout
             connection.setReadTimeout(10000);
 
-            // Create JSON payload
+            // Create JSON payload - every value is escaped so names with quotes can't break it
             String jsonPayload = String.format(
                     "{\"to\": \"%s\", \"body\": \"%s\", \"from\": \"%s\"}",
-                    toNumber, message, SENDER_ID
+                    jsonEscape(toNumber), jsonEscape(message), jsonEscape(SENDER_ID)
             );
 
             // Send request
@@ -164,6 +190,27 @@ public class SMSService {
             System.err.println("❌ Network error sending SMS: " + e.getMessage());
             return false;
         }
+    }
+
+    static String jsonEscape(String value) {
+        StringBuilder sb = new StringBuilder(value.length() + 16);
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /**

@@ -1,0 +1,19 @@
+# Local config with secrets - copy fuelapp.properties.example instead
+fuelapp.properties
+.env
+.env.*
+
+# Databases and user data (contain personal information - never commit)
+*.db
+*.db-journal
+*.sqlite
+*.sqbpro
+data/
+
+# Build output
+target/
+out/
+
+# IDE files
+.idea/
+*.iml

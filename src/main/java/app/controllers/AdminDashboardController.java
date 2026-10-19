@@ -2,6 +2,7 @@ package app.controllers;
 
 import app.SceneController;
 import app.database.FuelRequestDAO;
+import app.database.UserDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -36,8 +37,8 @@ public class AdminDashboardController implements Initializable {
         double profit = fuelDAO.calculateProfit();
         profitLabel.setText(String.format("R%.2f", profit));
 
-        // Total users (you can implement this later)
-        totalUsersLabel.setText("13");
+        // Total registered customers
+        totalUsersLabel.setText(String.valueOf(new UserDAO().countUsers()));
     }
 
     @FXML
